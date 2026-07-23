@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description"
+        content="Retroalimentación formativa — Proyecto Centinela, Fase 2 (Centinela del Río: alerta de pH en un acueducto comunitario rural). Maestría en Ciencia de Datos, Universidad Santo Tomás.">
+    <title>Retroalimentación · Centinela del Río · Fase 2 — USTA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Montserrat', 'Helvetica Neue', 'Arial', 'sans-serif'] },
+                    colors: {
+                        primary: '#3D008D', secondary: '#ED1E79', navy: '#001A4D',
+                        gold: '#FDB913', teal: '#0E7490', bg: '#F8FAFC', surface: '#FFFFFF',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F8FAFC; color: #1E293B; scroll-behavior: smooth;
+        }
+        code, pre, .mono { font-family: 'Fira Code', monospace; }
+
+        .usta-gradient { background: linear-gradient(140deg, #3D008D 0%, #ED1E79 100%); }
+        .usta-gradient-text {
+            background: linear-gradient(140deg, #3D008D 0%, #ED1E79 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .usta-header { background: linear-gradient(135deg, #001A4D 0%, #3D008D 60%, #5B1C9E 100%); }
+
+        .card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            transition: box-shadow .25s ease, transform .25s ease;
+        }
+        .card:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.11); transform: translateY(-3px); }
+        .card-static:hover { transform: none; box-shadow: 0 4px 18px rgba(0,0,0,0.07); }
+
+        ::-webkit-scrollbar { width: 9px; height: 9px; }
+        ::-webkit-scrollbar-track { background: #eef2f7; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#3D008D,#ED1E79); border-radius: 5px; }
+
+        @keyframes riseIn { from { opacity: .35; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .js .reveal.in { animation: riseIn .5s ease-out both; }
+
+        .icode {
+            background: #F1F5F9; color: #0F172A; padding: .08rem .42rem;
+            border-radius: 5px; font-size: .85em; font-family: 'Fira Code', monospace;
+        }
+        .codeblock {
+            background: #0F172A; color: #E2E8F0; border-radius: 12px;
+            padding: .9rem 1rem; font-family: 'Fira Code', monospace;
+            font-size: .78rem; line-height: 1.7; overflow-x: auto; white-space: pre;
+        }
+        .codeblock .cm { color: #64748B; }
+        .codeblock .hl { color: #FDE68A; font-weight: 500; }
+        .codeblock .ok { color: #86EFAC; font-weight: 600; }
+        .codeblock .bad { color: #FCA5A5; font-weight: 600; }
+
+        .tbl { width:100%; border-collapse: collapse; font-size:.9rem; }
+        .tbl th, .tbl td { border:1px solid #E2E8F0; padding:.6rem .7rem; vertical-align: top; text-align:left; }
+        .tbl thead th { color:#fff; }
+
+        .hit { background:#F3E8FF; box-shadow: inset 0 0 0 2px #3D008D; }
+        .hit-auto { background:#E0F2FE; box-shadow: inset 0 0 0 2px #0E7490; }
+        .hit-basico { background:#DCFCE7; box-shadow: inset 0 0 0 2px #15803D; }
+        .hit-inicial { background:#FEF3C7; box-shadow: inset 0 0 0 2px #B45309; }
+        .hit-badge {
+            display:inline-block; font-size:.62rem; font-weight:800; letter-spacing:.03em;
+            text-transform:uppercase; color:#fff; background:#3D008D;
+            border-radius:999px; padding:.1rem .5rem; margin-bottom:.35rem;
+        }
+        .hit-auto .hit-badge { background:#0E7490; }
+        .hit-basico .hit-badge { background:#15803D; }
+        .hit-inicial .hit-badge { background:#B45309; }
+
+        .callout { border-left: 4px solid; border-radius: 12px; padding: .9rem 1.1rem; }
+        .callout-info   { background:#F3F0FC; border-color:#3D008D; }
+        .callout-tip    { background:#ECFDF5; border-color:#0E9F6E; }
+        .callout-warn   { background:#FFFBEB; border-color:#FDB913; }
+        .callout-danger { background:#FEF2F2; border-color:#DC2626; }
+
+        .sec-title { font-weight: 800; letter-spacing: -.02em; }
+        .navlink { transition: color .2s ease, background .2s ease; }
+        .navlink:hover { color:#3D008D; }
+
+        @media print {
+            .no-print { display: none; }
+            body { background:#fff; }
+            .card { box-shadow:none; border:1px solid #E2E8F0; }
+            section { break-inside: avoid; }
+        }
+    </style>
+</head>
+
+<body class="bg-bg">
+    <script>document.documentElement.classList.add('js');</script>
+
+    <!-- ====================== CABECERA ====================== -->
+    <header class="usta-header text-white">
+        <div class="max-w-6xl mx-auto px-5 py-10 md:py-14">
+            <p class="text-xs md:text-sm tracking-widest uppercase text-white/70 font-semibold mb-3">
+                <i class="fas fa-comments mr-2"></i>Retroalimentación formativa · Fase 2
+            </p>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
+                Su Proyecto Centinela · Fase 2
+            </h1>
+            <p class="text-lg md:text-xl text-white/85 font-light mb-6">
+                Centinela del Río — alerta temprana de pH fuera de rango en un acueducto comunitario · qué logró la
+                entrega y por dónde la llevaría más lejos
+            </p>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                <div class="bg-white/10 rounded-xl px-4 py-3 border border-white/15">
+                    <p class="text-white/60 text-xs mb-0.5">Espacio académico</p>
+                    <p class="font-semibold">Redes Neuronales — Deep Learning</p>
+                    <p class="text-white/70 text-xs mono">EA-N-F-004</p>
+                </div>
+                <div class="bg-white/10 rounded-xl px-4 py-3 border border-white/15">
+                    <p class="text-white/60 text-xs mb-0.5">Grupo</p>
+                    <p class="font-semibold">Chiquiza · Lerma · Villarraga</p>
+                    <p class="text-white/70 text-xs">Proyecto «Centinela del Río»</p>
+                </div>
+                <div class="bg-white/10 rounded-xl px-4 py-3 border border-white/15">
+                    <p class="text-white/60 text-xs mb-0.5">Peso en el curso</p>
+                    <p class="font-semibold">30 % · 46 h</p>
+                    <p class="text-white/70 text-xs">Módulo 2 · Fase 2</p>
+                </div>
+                <div class="bg-white/10 rounded-xl px-4 py-3 border border-white/15">
+                    <p class="text-white/60 text-xs mb-0.5">Fecha</p>
+                    <p class="font-semibold">2026-07-16</p>
+                    <p class="text-white/70 text-xs">Módulo 2 · Arquitecturas</p>
+                </div>
+            </div>
+            <p class="mt-5 text-sm text-white/70">
+                <i class="fas fa-circle-info mr-2"></i>Les dejo mi devolución de la entrega. Empiezo por lo que
+                hicieron bien, después les explico la nota con la rúbrica a la vista y cierro con una ruta de mejora.
+            </p>
+        </div>
+    </header>
+
+    <!-- ====================== NAV ====================== -->
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200 no-print">
+        <div class="max-w-6xl mx-auto px-5 py-2 flex items-stretch">
+            <div class="flex-1 min-w-0 overflow-x-auto flex gap-1 text-sm font-semibold text-slate-600">
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#nota"><i class="fas fa-award mr-1"></i>Calificación</a>
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#bien"><i class="fas fa-circle-check mr-1"></i>Lo que hicieron bien</a>
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#rubrica"><i class="fas fa-table-list mr-1"></i>Rúbrica</a>
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#revision"><i class="fas fa-magnifying-glass-chart mr-1"></i>Qué vi en su código</a>
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#mejorar"><i class="fas fa-arrow-trend-up mr-1"></i>Cómo mejorar</a>
+                <a class="navlink rounded-lg px-2.5 py-1.5 whitespace-nowrap" href="#sustentacion"><i class="fas fa-microphone-lines mr-1"></i>Sustentación</a>
+            </div>
+            <div class="flex-none w-14 md:w-24" aria-hidden="true"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-5 py-10 space-y-12">
+
+        <!-- ====================== NOTA ====================== -->
+        <section id="nota" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-5"><i class="fas fa-award text-secondary mr-2"></i>Calificación</h2>
+
+            <div class="card card-static p-6 md:p-8">
+                <div class="grid md:grid-cols-[auto,1fr] gap-8 items-center">
+
+                    <div class="flex justify-center">
+                        <svg viewBox="0 0 140 140" class="w-44 h-44" role="img" aria-label="Calificación 4,2 sobre 5,0">
+                            <defs>
+                                <linearGradient id="gradNota" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#3D008D" />
+                                    <stop offset="100%" stop-color="#ED1E79" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="70" cy="70" r="54" fill="none" stroke="#EEF2F7" stroke-width="14" />
+                            <circle cx="70" cy="70" r="54" fill="none" stroke="url(#gradNota)" stroke-width="14"
+                                    stroke-linecap="round" stroke-dasharray="285.0 339.3"
+                                    transform="rotate(-90 70 70)" />
+                            <text x="70" y="66" text-anchor="middle" font-size="34" font-weight="800" fill="#001A4D"
+                                  font-family="Montserrat, sans-serif">4,2</text>
+                            <text x="70" y="88" text-anchor="middle" font-size="13" font-weight="600" fill="#64748B"
+                                  font-family="Montserrat, sans-serif">de 5,0</text>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="rounded-full px-4 py-1.5 text-sm font-bold inline-block mb-3"
+                              style="background:#E0F2FE;color:#0E7490">Nivel Autónomo (4,0–4,5)</span>
+                        <p class="text-slate-700 leading-relaxed mb-4">
+                            Me gustó lo cuidada que está su entrega, en construcción y en comunicación: entregaron los
+                            pesos del modelo, un README por cada fase, un informe con la lista de referencias APA completa
+                            y una bitácora con <strong>dos</strong> auditorías de IA reales. Su <strong>Rama B (temporal,
+                            LSTM/GRU) es sobresaliente</strong>, y eso —con el uso responsable de IA— es lo que sostiene la
+                            nota en la banda Autónomo. La frena la <strong>Rama C (fusión), que pesa el 30 %</strong>: la
+                            clave que empareja cada imagen con su serie quedó fija en un mismo valor, y así la modalidad
+                            visual nunca llegó a participar del modelo. Nada de esto le resta mérito al resto; me marca el
+                            punto exacto desde donde tienen que crecer.
+                        </p>
+
+                        <div class="overflow-x-auto">
+                            <table class="tbl" style="min-width:560px">
+                                <thead>
+                                    <tr style="background:#001A4D">
+                                        <th style="width:44%">Criterio (peso)</th>
+                                        <th>Nivel alcanzado</th>
+                                        <th style="width:12%">Nota</th>
+                                        <th style="width:16%">Aporte ponderado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>1.</strong> Rama visual — CNN y <em>Transfer Learning</em> (20 %)</td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#E0F2FE;color:#0E7490">Autónomo</span></td>
+                                        <td class="mono">4,0</td>
+                                        <td class="mono">0,80</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2.</strong> Rama temporal — LSTM/GRU (RNN de contraste) (20 %)</td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#F3E8FF;color:#3D008D">Estratégico</span></td>
+                                        <td class="mono">4,8</td>
+                                        <td class="mono">0,96</td>
+                                    </tr>
+                                    <tr style="background:#F3F0FC">
+                                        <td><strong>3.</strong> Fusión, ablación y alineación legítima (30 %)</td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#DCFCE7;color:#15803D">Básico</span></td>
+                                        <td class="mono">3,7</td>
+                                        <td class="mono">1,11</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4.</strong> Uso responsable de IA (15 %)</td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#F3E8FF;color:#3D008D">Estratégico</span></td>
+                                        <td class="mono">4,6</td>
+                                        <td class="mono">0,69</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5.</strong> Comunicación de resultados (15 %)</td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#E0F2FE;color:#0E7490">Autónomo</span></td>
+                                        <td class="mono">4,3</td>
+                                        <td class="mono">0,65</td>
+                                    </tr>
+                                    <tr style="background:#F8FAFC">
+                                        <td><strong class="text-navy">Total Fase 2</strong> <span class="text-slate-500">(100 %)</span></td>
+                                        <td><span class="rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:#E0F2FE;color:#0E7490">Autónomo</span></td>
+                                        <td class="mono"><strong class="text-primary text-base">4,2</strong></td>
+                                        <td class="mono"><strong>4,21</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 codeblock" style="font-size:.75rem">4,0×0,20 + 4,8×0,20 + 3,7×0,30 + 4,6×0,15 + 4,3×0,15
+  = 0,80 + 0,96 + 1,11 + 0,69 + 0,65 = <span class="ok">4,21 → 4,2</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================== LO QUE HICIERON BIEN ====================== -->
+        <section id="bien" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-3"><i class="fas fa-circle-check text-secondary mr-2"></i>Lo que hicieron bien</h2>
+            <p class="text-slate-600 mb-5 max-w-3xl">
+                Prefiero empezar por aquí, porque es trabajo real y es la base sobre la que van a levantar todo lo demás.
+            </p>
+
+            <div class="card card-static p-6">
+                <ul class="space-y-3 text-sm text-slate-700">
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Una rama temporal sobresaliente.</strong> Evidencian el desvanecimiento del gradiente por las <strong>dos vías</strong> que admite la rúbrica —una tarea sintética de 100 pasos (RNN <span class="icode">49,8 %</span> ≈ azar frente a LSTM <span class="icode">100 %</span> / GRU <span class="icode">99,5 %</span>) <em>y</em> las normas de gradiente <span class="icode">‖∂L/∂x_t‖</span>— y eligen GRU con criterio (mejor ROC-AUC, 25 % menos parámetros que la LSTM). Llegaron ahí tras descartar dos diseños fallidos, y vieron algo fino y correcto: en inicialización, la LSTM y la GRU <em>también</em> se desvanecen; lo corrigieron con la inicialización de compuertas de Jozefowicz et al. (2015).</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Dos auditorías de IA reales, no una.</strong> La entrada 5 (un pareo artificial que producía fuga y hacía colapsar el modelo a ROC-AUC 0,31, detectado y rediseñado) y la entrada 6 (un experimento sintético que falló dos veces y se corrigió) son fallos reales, que entendieron y corrigieron. La entrada 4 incluso atrapa a la IA redactando una conclusión que contradecía la tabla.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Se autocorrigieron a tiempo.</strong> Detectaron que su primera versión incurría en el pareo artificial que la rúbrica sanciona (nivel Inicial) y rediseñaron la rama entera por mérito propio.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Empaquetado ejemplar.</strong> Pesos, READMEs por fase, figuras, informe y bitácora en PDF y Word: un estándar de entrega muy sólido.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Fuentes admisibles y bien citadas.</strong> El repositorio UCI está explícitamente permitido por el catálogo del curso, y el informe trae una lista de referencias APA completa (8 fuentes).</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Una modalidad visual genuina.</strong> Fotografías reales de agua, independientes de la serie: la materia prima para un sistema multimodal de verdad ya existe en su entrega.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-check mt-1 text-green-600"></i><span><strong>Honestidad de la buena.</strong> Reconocen que la RNN simple empata con la LSTM (<span class="icode">0,9332</span> frente a <span class="icode">0,9306</span>) y explican por qué, en lugar de maquillar el resultado.</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ====================== RÚBRICA ====================== -->
+        <section id="rubrica" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-3"><i class="fas fa-table-list text-secondary mr-2"></i>Rúbrica valorada</h2>
+            <p class="text-slate-600 mb-5 max-w-3xl">
+                Es la rúbrica unificada oficial de la Fase 2. En cada criterio marqué el <strong>nivel que
+                alcanzaron</strong> y anoté la evidencia con la que lo ubico ahí. Los pesos suman 100 %.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-2 mb-5 text-xs">
+                <span class="font-semibold text-slate-500 mr-1">Bandas:</span>
+                <span class="rounded-full px-3 py-1 font-semibold" style="background:#F3E8FF;color:#3D008D">Estratégico 4,6–5,0</span>
+                <span class="rounded-full px-3 py-1 font-semibold" style="background:#E0F2FE;color:#0E7490">Autónomo 4,0–4,5</span>
+                <span class="rounded-full px-3 py-1 font-semibold" style="background:#DCFCE7;color:#15803D">Básico 3,0–3,9</span>
+                <span class="rounded-full px-3 py-1 font-semibold" style="background:#FEF3C7;color:#B45309">Inicial 1,0–2,9</span>
+                <span class="rounded-full px-3 py-1 font-bold text-white" style="background:#3D008D"><i class="fas fa-location-crosshairs mr-1"></i>Celda resaltada = nivel alcanzado</span>
+            </div>
+
+            <div class="overflow-x-auto card card-static p-1">
+                <table class="tbl" style="min-width:1040px">
+                    <thead>
+                        <tr style="background:#001A4D">
+                            <th style="width:17%">Criterio (peso)</th>
+                            <th>Estratégico (4,6–5,0)</th>
+                            <th>Autónomo (4,0–4,5)</th>
+                            <th>Básico (3,0–3,9)</th>
+                            <th>Inicial (1,0–2,9)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- C1 -->
+                        <tr>
+                            <td><strong>1. Rama visual — CNN y Transfer Learning (20 %)</strong>
+                                <div class="mt-2"><span class="rounded-full px-2 py-0.5 text-xs font-bold" style="background:#E0F2FE;color:#0E7490">4,0</span></div>
+                            </td>
+                            <td>Compara 2 arquitecturas preentrenadas analizando parámetros, profundidad y velocidad de inferencia; justifica <em>Feature Extraction</em> vs <em>Fine-Tuning</em> con evidencia empírica; aporta Grad-CAM.</td>
+                            <td class="hit hit-auto">
+                                <span class="hit-badge"><i class="fas fa-location-crosshairs mr-1"></i>Nivel alcanzado</span>
+                                Compara 2 arquitecturas; justifica la estrategia según tamaño/similitud con ImageNet; <em>data augmentation</em> y evaluación por clase correctas.
+                                <p class="text-xs text-slate-600 mt-2 pt-2 border-t border-slate-300"><strong>Lo que vi:</strong> ResNet50 (25,6 M) y EfficientNet-B0 (5,3 M) comparadas; <em>Feature Extraction</em> justificado por tamaño y similitud; matrices de confusión y Grad-CAM en ambas. <strong>No lo subo a Estratégico</strong> porque el <em>Fine-Tuning</em> se rechaza <em>a priori</em>, sin evidencia empírica, la velocidad de inferencia nunca se mide y el <em>data augmentation</em> que el informe declara <strong>no llega a aplicarse</strong> (ver <a href="#revision" class="underline" style="color:#3D008D">«Qué vi en su código»</a>).</p>
+                            </td>
+                            <td>Usa una sola arquitectura sin comparación rigurosa; justificación superficial; no distingue las estrategias de Transfer Learning.</td>
+                            <td>Selecciona arquitectura sin justificación o con error grave (p. ej. MLP para imágenes).</td>
+                        </tr>
+                        <!-- C2 -->
+                        <tr>
+                            <td><strong>2. Rama temporal — LSTM/GRU (RNN de contraste) (20 %)</strong>
+                                <div class="mt-2"><span class="rounded-full px-2 py-0.5 text-xs font-bold" style="background:#F3E8FF;color:#3D008D">4,8</span></div>
+                            </td>
+                            <td class="hit">
+                                <span class="hit-badge"><i class="fas fa-location-crosshairs mr-1"></i>Nivel alcanzado</span>
+                                Implementa LSTM y GRU con ventana de referencia justificada y RNN simple de contraste; evidencia el desvanecimiento (normas de gradiente o diferencia de desempeño en dependencias largas); decide GRU vs LSTM con criterio.
+                                <p class="text-xs text-slate-600 mt-2 pt-2 border-t border-slate-300"><strong>Lo que vi:</strong> las tres celdas con hiperparámetros comparables; el desvanecimiento evidenciado por <strong>las dos vías</strong> que la rúbrica admite —tarea sintética de 100 pasos (RNN 49,8 % ≈ azar frente a LSTM 100 % / GRU 99,5 %) <em>y</em> normas ‖∂L/∂x_t‖—; GRU elegida con criterio (mejor ROC-AUC, 25 % menos parámetros que LSTM); reconocen que la RNN simple empata (0,9332 vs 0,9306) y explican por qué. El anexo llegó con todas sus salidas visibles.</p>
+                            </td>
+                            <td>Implementa LSTM y GRU correctamente más la RNN de contraste; respeta el orden temporal; compara con 2+ métricas e interpreta.</td>
+                            <td>Implementa solo una celda con compuertas, o prescinde de la RNN de contraste, o no aporta evidencia del desvanecimiento.</td>
+                            <td>Mezcla datos temporales (sin respetar el orden), confunde las arquitecturas o ninguna celda con compuertas funciona.</td>
+                        </tr>
+                        <!-- C3 -->
+                        <tr>
+                            <td><strong>3. Fusión, ablación y alineación legítima (30 %)</strong>
+                                <div class="mt-2"><span class="rounded-full px-2 py-0.5 text-xs font-bold" style="background:#DCFCE7;color:#15803D">3,7</span></div>
+                            </td>
+                            <td>Demuestra la clave de alineación entre modalidades (qué campo/fecha/id las une), con co-registro por muestra cuando hay datos georreferenciados y fechados; fusión funcional con ablación (solo-imagen / solo-serie / fusionado) y análisis honesto del aporte de cada modalidad, incluso resultados negativos.</td>
+                            <td>Fusión funcional comparada frente a al menos una rama individual; declara la alineación agregada (región/periodo) con sus limitaciones; <strong>interpretación correcta</strong>.</td>
+                            <td class="hit hit-basico">
+                                <span class="hit-badge"><i class="fas fa-location-crosshairs mr-1"></i>Nivel alcanzado</span>
+                                Concatena sin estudio de ablación, o usa alineación agregada sin declarar sus limitaciones.
+                                <p class="text-xs text-slate-600 mt-2 pt-2 border-t border-slate-300"><strong>Lo que vi:</strong> fusión tardía de <em>embeddings</em> reales (2048+64), ablación completa sobre las 9.879 ventanas, validación separada del <em>test</em>, <em>pools</em> disjuntos y limitación declarada con prominencia — todo esto por encima del descriptor. <strong>Lo dejo en Básico por la interpretación:</strong> la clave de alineación quedó constante (<span class="icode">cond = 1</span> en el 100 % de las ventanas), la modalidad visual no llegó a participar y la tesis de «redundancia» no se sostiene (ver <a href="#revision" class="underline" style="color:#3D008D">«Qué vi en su código»</a>). Se suma que el cuaderno llegó sin salidas y que faltan los pesos de la fusión.</p>
+                            </td>
+                            <td>Fusión no funcional o ausente; pareo artificial por muestra o <em>feature</em> constante (fuga de datos) sin advertirlo.</td>
+                        </tr>
+                        <!-- C4 -->
+                        <tr>
+                            <td><strong>4. Uso responsable de IA (15 %)</strong>
+                                <div class="mt-2"><span class="rounded-full px-2 py-0.5 text-xs font-bold" style="background:#F3E8FF;color:#3D008D">4,6</span></div>
+                            </td>
+                            <td class="hit">
+                                <span class="hit-badge"><i class="fas fa-location-crosshairs mr-1"></i>Nivel alcanzado</span>
+                                Bitácora con decisiones deliberadas (casos <em>Modificada/Rechazada</em> bien fundamentados); defiende cada decisión como propia en la sustentación; auditoría con un fallo no trivial corregido.
+                                <p class="text-xs text-slate-600 mt-2 pt-2 border-t border-slate-300"><strong>Lo que vi:</strong> ocho entradas con justificación técnica y <strong>dos</strong> auditorías reales — la entrada 5 (pareo artificial → fuga → colapso a ROC-AUC 0,31, detectado y rediseñado) y la entrada 6 (el experimento sintético falló dos veces: saturación de la <em>tanh</em> con señal ±3, y desvanecimiento también en LSTM/GRU sin entrenar; corregido con inicialización de compuertas de Jozefowicz). La entrada 4 atrapa a la IA redactando una conclusión que contradecía la tabla. <strong>Único descuento:</strong> la entrada 8 afirma haber verificado «todas las cifras contra las salidas reales» — precisamente la verificación que habría atrapado la clave constante.</p>
+                            </td>
+                            <td>Bitácora completa y verificada; sustenta la mayoría de sus decisiones; la auditoría documenta y corrige un fallo real.</td>
+                            <td>Registro superficial; titubea en la sustentación; auditoría débil o genérica.</td>
+                            <td>Bitácora ausente o señales de delegación ciega; no defiende sus decisiones.</td>
+                        </tr>
+                        <!-- C5 -->
+                        <tr>
+                            <td><strong>5. Comunicación de resultados (15 %)</strong>
+                                <div class="mt-2"><span class="rounded-full px-2 py-0.5 text-xs font-bold" style="background:#E0F2FE;color:#0E7490">4,3</span></div>
+                            </td>
+                            <td>Comunicación profesional; visualizaciones estáticas claras y, como <em>bonus</em>, dashboard interactivo; informe con narrativa, recomendaciones accionables y citación APA correcta.</td>
+                            <td class="hit hit-auto">
+                                <span class="hit-badge"><i class="fas fa-location-crosshairs mr-1"></i>Nivel alcanzado</span>
+                                Visualizaciones estáticas bien comentadas para audiencia no técnica; informe claro y bien estructurado con recomendaciones.
+                                <p class="text-xs text-slate-600 mt-2 pt-2 border-t border-slate-300"><strong>Lo que vi:</strong> informe de 5 páginas (límite 8) con <strong>lista de referencias APA completa</strong> (8 fuentes), nueve figuras, README por fase y una traducción al cliente que me pareció muy buena («de cada diez días realmente riesgosos detecta cerca de ocho»). <strong>No lo subo a Estratégico</strong> porque tres afirmaciones no coinciden con la evidencia: el <em>augmentation</em> declarado, la «mejora» de la fusión (que es un cambio de umbral) y el ROC-AUC 0,9997 a cuatro decimales sobre 78 imágenes.</p>
+                            </td>
+                            <td>Visualizaciones básicas; informe con estructura incompleta; recomendaciones genéricas.</td>
+                            <td>Visualizaciones ausentes o ilegibles; informe desorganizado o sin recomendaciones.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ====================== QUÉ VI EN SU CÓDIGO ====================== -->
+        <section id="revision" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-3"><i class="fas fa-magnifying-glass-chart text-secondary mr-2"></i>Qué vi al revisar su código</h2>
+            <p class="text-slate-600 mb-5 max-w-3xl">
+                Me detuve en las observaciones que más importan y las dejo con el código a la vista, porque entenderlas a
+                fondo es lo que más les va a servir en la Fase 3. No las lean como reproche: marcan dónde el trabajo se
+                desvió de lo que medía la rúbrica, casi siempre por un detalle reparable. Todo lo verifiqué ejecutando su
+                propio código sobre sus propios datos (<span class="icode">data/water_dataset.mat</span>).
+            </p>
+
+            <div class="space-y-6">
+
+                <div class="card card-static p-6">
+                    <h3 class="font-extrabold text-navy mb-3"><span class="usta-gradient-text">1.</span> La clave que empareja imagen con serie quedó constante</h3>
+                    <p class="text-sm text-slate-700 mb-3">
+                        En la Rama C, la condición que decide qué imagen recibe cada ventana compara el pH del día contra
+                        los umbrales seguros, pero multiplicando antes por 10:
+                    </p>
+                    <div class="codeblock mb-4"><span class="cm"># Rama C · BLOQUE 2 — la condición que empareja cada imagen con su serie</span>
+ph_hoy_max = valores[i-1, IDX_PH_MAX] <span class="hl">* 10</span>
+ph_hoy_min = valores[i-1, IDX_PH_MIN] <span class="hl">* 10</span>
+cond = int(ph_hoy_max &gt; 8.5 <span class="bad">or</span> ph_hoy_min &lt; 6.5)</div>
+                    <p class="text-sm text-slate-700 mb-3">
+                        El detalle es de <strong>unidades</strong>: los once rasgos del <span class="icode">.mat</span>
+                        están <strong>normalizados a [0, 1]</strong>, no son pH ÷ 10. Se ve enseguida —el
+                        <span class="icode">pH_min</span> recorre [0,0003 · 1,0000], y un «pH mínimo» de 0,003 es
+                        físicamente imposible—, así que multiplicar por 10 y comparar contra 6,5 y 8,5 mezcla unidades
+                        normalizadas con unidades físicas. La consecuencia, medida sobre sus datos:
+                    </p>
+                    <div class="overflow-x-auto mb-4">
+                        <table class="tbl" style="min-width:520px">
+                            <thead>
+                                <tr style="background:#001A4D">
+                                    <th>Comprobación</th><th style="width:24%">Resultado</th><th style="width:34%">Lectura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="icode">pH_max*10 &gt; 8.5</span> se cumple en…</td>
+                                    <td class="mono">85,5 % de los días</td>
+                                    <td class="text-slate-600">Ya dispara casi siempre.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="icode">pH_min*10 &lt; 6.5</span> se cumple en…</td>
+                                    <td class="mono"><strong>98,4 % de los días</strong></td>
+                                    <td class="text-slate-600">La rama del <em>or</em> que domina.</td>
+                                </tr>
+                                <tr style="background:#FEF3C7">
+                                    <td><strong>Unión → <span class="icode">cond = 1</span></strong></td>
+                                    <td class="mono"><strong>100,0 % de las ventanas</strong></td>
+                                    <td class="text-slate-600"><strong>La clave queda fija.</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="icode">corr(cond, riesgo)</span></td>
+                                    <td class="mono">nan</td>
+                                    <td class="text-slate-600">Varianza cero: no hay correlación que medir.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="callout callout-warn">
+                        <p class="text-sm text-slate-700 mb-2">
+                            Como <span class="icode">cond</span> vale 1 en <strong>todas</strong> las ventanas, la rama de
+                            «agua limpia» (<span class="icode">indices[~mask]</span>) nunca se ejecuta y la clase
+                            <em>Limpia</em> —311 de 512 imágenes, el 61 % del conjunto— no se usa jamás. Todas las ventanas
+                            reciben una imagen sorteada al azar del mismo grupo <em>Turbia + Contaminada</em>, así que la
+                            rama visual entra al modelo como <strong>ruido puro</strong>: de ahí el 0,502 exacto. Por eso yo
+                            reformularía la tesis del informe —«la modalidad visual resulta <em>redundante</em> con la
+                            serie»—: no es redundante, es ruido; nunca hubo información con la cual serlo. Y lo mejor es que
+                            la comprobación que lo revelaba <strong>ya estaba escrita en su código</strong> (una línea que
+                            imprime la media de <span class="icode">cond</span>): conservar esa salida la habría hecho
+                            evidente.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card card-static p-6">
+                    <h3 class="font-extrabold text-navy mb-3"><span class="usta-gradient-text">2.</span> Algunas cifras del informe no coinciden con lo que el código produce</h3>
+                    <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 mb-4">
+                        <li><strong>La «mejora» de la fusión es un cambio de umbral.</strong> Solo-serie y fusión dan el
+                            <strong>mismo ROC-AUC a cuatro decimales</strong> (0,9289 = 0,9289); la ganancia de precisión
+                            (0,82 frente a 0,75) se paga íntegra con recall (0,825 frente a 0,879). Es el mismo ordenamiento
+                            leído en otro umbral, no información nueva — y además va en contra de su propia recomendación
+                            (iii) de priorizar el recall.</li>
+                        <li><strong>El aumento de datos declarado no llega a aplicarse.</strong>
+                            <span class="icode">transform_train</span> se define y se asocia a
+                            <span class="icode">dataset_completo</span>, pero las <em>features</em> se extraen de
+                            <span class="icode">ds_train_val</span>, construido con <span class="icode">transform_val</span>;
+                            con <em>features</em> precomputadas, el aumento por época es imposible por diseño.</li>
+                        <li><strong>Falsa precisión.</strong> Un ROC-AUC de 0,9997 a cuatro decimales, idéntico en ambas
+                            arquitecturas y medido sobre 78 imágenes, es una muestra demasiado pequeña para esa precisión y
+                            no trae intervalo de confianza.</li>
+                        <li><strong>El <em>Fine-Tuning</em> se rechaza <em>a priori</em>.</strong> La decisión es sensata,
+                            pero la rúbrica pide evidencia empírica y el experimento no se corrió.</li>
+                    </ul>
+                    <div class="callout callout-warn">
+                        <p class="text-sm text-slate-700">
+                            La lección es de método: <strong>el informe tiene que contar exactamente lo que hace el
+                            código</strong>. Si un número no se calculó —o se calculó de otra forma—, no lo reporten como
+                            resultado. Es la misma disciplina que ustedes ya aplicaron muy bien en la bitácora.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info">
+                    <p class="text-sm text-slate-700">
+                        <i class="fas fa-lightbulb text-primary mr-2"></i><strong>Un detalle de orden por cerrar:</strong>
+                        el cuaderno de la Rama C llegó con <strong>todas las salidas borradas</strong>, así que el
+                        criterio de mayor peso me llega sin evidencia ejecutable, y faltan los pesos de la fusión
+                        (<span class="icode">Centinela_Fase2_RamaC_Fusion.pth</span>) que el propio README anuncia. Se
+                        suma que el cuaderno dice «3.020 ventanas» y el informe 9.879 (la correcta es 9.879), el README
+                        anuncia Colab pero la corrida fue local, y quedan marcadores «(agregar …)» sin resolver. Para la
+                        Fase 3, dejen <strong>un solo cuaderno coherente con salidas visibles</strong>, con sus pesos y
+                        con las cifras del informe; así un trabajo bueno deja de leerse como inconsistente.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================== CÓMO MEJORAR ====================== -->
+        <section id="mejorar" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-3"><i class="fas fa-arrow-trend-up text-secondary mr-2"></i>Cómo mejorar — camino hacia la Fase 3</h2>
+            <p class="text-slate-600 mb-5 max-w-3xl">
+                Casi todo esto se arregla sin empezar de cero, porque su Rama B y su uso de la IA ya son base firme. Les
+                ordeno los pasos por impacto:
+            </p>
+
+            <div class="card card-static p-6">
+                <ul class="space-y-3 text-sm text-slate-700">
+                    <li class="flex gap-2"><i class="fas fa-1 mt-1 text-primary font-bold"></i><span><strong>Corrijan la clave de alineación y reejecuten la ablación.</strong> Comparen los rasgos <strong>en sus unidades reales</strong> (normalizadas a [0, 1]), sin el <span class="icode">×10</span>, para que <span class="icode">cond</span> vuelva a variar y la clase <em>Limpia</em> participe. Con eso, la ablación solo-imagen / solo-serie / fusionado por fin mide algo. Es el cambio de mayor impacto: desbloquea el criterio del 30 %.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-2 mt-1 text-primary font-bold"></i><span><strong>Entreguen la Rama C con todas sus salidas y sus pesos.</strong> El criterio de mayor peso necesita evidencia ejecutable: el cuaderno corrido con sus resultados a la vista y el archivo <span class="icode">Centinela_Fase2_RamaC_Fusion.pth</span> que el README ya anuncia.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-3 mt-1 text-primary font-bold"></i><span><strong>Reinterpreten la «ganancia» de la fusión.</strong> Con ROC-AUC idéntico, precisión y recall solo se intercambian: es un cambio de umbral, no información nueva. Díganlo así y alinéenlo con su propia recomendación de priorizar el recall.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-4 mt-1 text-primary font-bold"></i><span><strong>Activen de verdad el aumento de datos, o no lo declaren.</strong> Si quieren <em>augmentation</em>, aplíquenlo en vivo sobre las imágenes (no sobre <em>features</em> precomputadas); si no, retiren la afirmación del informe.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-5 mt-1 text-primary font-bold"></i><span><strong>Reporten la incertidumbre.</strong> Para el ROC-AUC de la rama visual, den un intervalo de confianza en vez de cuatro decimales sobre 78 imágenes; un número idéntico en dos arquitecturas distintas es señal de muestra pequeña.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-6 mt-1 text-primary font-bold"></i><span><strong>Respalden la decisión de <em>Fine-Tuning</em> con el experimento.</strong> La elección puede ser la misma, pero corrida: comparen <em>Feature Extraction</em> vs <em>Fine-Tuning</em> con evidencia, como pide la rúbrica.</span></li>
+                    <li class="flex gap-2"><i class="fas fa-7 mt-1 text-primary font-bold"></i><span><strong>Cierren las inconsistencias de empaquetado.</strong> Unifiquen el número de ventanas (9.879), aclaren Colab vs corrida local y resuelvan los marcadores «(agregar …)» pendientes.</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ====================== SUSTENTACIÓN ====================== -->
+        <section id="sustentacion" class="reveal">
+            <h2 class="sec-title text-2xl md:text-3xl text-navy mb-3"><i class="fas fa-microphone-lines text-secondary mr-2"></i>Prepárense para la sustentación</h2>
+            <p class="text-slate-600 mb-5 max-w-3xl">
+                Estas tres preguntas se las voy a hacer en la sustentación oral. No busco que defiendan lo que no
+                funcionó, sino comprobar que <strong>entienden</strong> lo que pasó y saben cómo se corrige; las dos
+                primeras son las decisivas. Les recomiendo prepararlas.
+            </p>
+
+            <div class="space-y-4">
+                <div class="card card-static p-6 border-l-4" style="border-left-color:#B45309">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:#B45309"><i class="fas fa-1 mr-1"></i>Sobre la clave de alineación</p>
+                    <p class="text-slate-700 text-sm leading-relaxed">
+                        Su cuaderno imprime <span class="icode">cond_train.mean()*100</span>. <strong>¿Qué valor sale, y
+                        qué concluyen de él?</strong> Al ejecutar su código sobre sus datos me da <strong>100,0 %</strong>:
+                        la clave no varía, la clase <em>Limpia</em> nunca se usa y la imagen entra como ruido. ¿Cómo cambia
+                        esto la tesis de la «redundancia» de la modalidad visual?
+                    </p>
+                    <p class="text-xs text-slate-500 mt-2 italic">Busco que reconozcan el fallo de unidades y expliquen cómo rehacer la ablación con la condición corregida.</p>
+                </div>
+
+                <div class="card card-static p-6 border-l-4" style="border-left-color:#B45309">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:#B45309"><i class="fas fa-2 mr-1"></i>Sobre la ganancia de la fusión</p>
+                    <p class="text-slate-700 text-sm leading-relaxed">
+                        Solo-serie y fusión dan el <strong>mismo ROC-AUC (0,9289)</strong>, pero ustedes reportan más
+                        precisión y menos recall. <strong>¿Qué significa eso geométricamente sobre la curva ROC?</strong>
+                        Y si su recomendación (iii) es priorizar el recall, ¿por qué desplegar una fusión que lo baja de
+                        0,879 a 0,825?
+                    </p>
+                    <p class="text-xs text-slate-500 mt-2 italic">Busco que nombren el desplazamiento de umbral y adviertan la contradicción con su propia recomendación al cliente.</p>
+                </div>
+
+                <div class="card card-static p-6 border-l-4" style="border-left-color:#0E7490">
+                    <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:#0E7490"><i class="fas fa-3 mr-1"></i>Sobre el horizonte de predicción</p>
+                    <p class="text-slate-700 text-sm leading-relaxed">
+                        La ventana abarca los días <span class="icode">[i-14, i-1]</span> y la etiqueta
+                        <span class="icode">etiq[i]</span> corresponde al pH del día <span class="icode">i+1</span>:
+                        <strong>el día <span class="icode">i</span> no lo usa nadie.</strong> ¿Es un sistema a un día o a
+                        dos, como afirma el informe?
+                    </p>
+                    <p class="text-xs text-slate-500 mt-2 italic">El error va en dirección conservadora —la tarea real es más difícil que la declarada—, pero les recomiendo precisar la promesa de «un día de anticipación» al cliente.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================== CIERRE ====================== -->
+        <section id="cierre" class="reveal">
+            <div class="usta-gradient rounded-2xl p-7 md:p-9 text-white">
+                <h2 class="sec-title text-2xl md:text-3xl mb-4"><i class="fas fa-flag-checkered mr-2"></i>En resumen</h2>
+                <p class="text-white/90 leading-relaxed mb-4">
+                    Su entrega demuestra que saben auditar: lo hicieron dos veces, y una de esas auditorías los sacó por
+                    mérito propio del pareo artificial que la rúbrica sanciona. Esa Rama B sobresaliente sostiene la nota
+                    en la banda Autónomo, en <strong>4,2</strong>, y la acompañan su uso responsable de la IA y un
+                    empaquetado muy cuidado.
+                </p>
+                <p class="text-white/90 leading-relaxed">
+                    La fijo en 4,2 por la Rama C: la clave de alineación quedó constante y la modalidad visual entró como
+                    ruido, mientras el informe la daba por participante. Y si me quedo con una sola lección para la Fase 3,
+                    es esta: la comprobación que lo revelaba <strong>ya estaba escrita en su propio cuaderno</strong> (una
+                    línea que imprime 100,0 %), y bastaba con conservar las salidas para verla. Corrijan esa condición,
+                    reejecuten la ablación, y esta Fase 2 queda como <strong>candidata clara al nivel Estratégico</strong>.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="usta-header text-white/70 mt-12">
+        <div class="max-w-6xl mx-auto px-5 py-8 text-sm">
+            <p class="font-semibold text-white mb-1">Universidad Santo Tomás · Maestría en Ciencia de Datos</p>
+            <p class="mb-3">Profundización I: Redes Neuronales — Deep Learning · <span class="mono">EA-N-F-004</span> · Docente: Javier Mauricio Sierra</p>
+            <p class="text-xs text-white/50">
+                <i class="fas fa-circle-info mr-1"></i>Retroalimentación de la Fase 2 para el grupo Chiquiza · Lerma · Villarraga.
+                Es un documento personal del grupo: la nota y mis observaciones son suyas y no las comparto con otros equipos.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var obs = new IntersectionObserver(function (entradas) {
+                entradas.forEach(function (e) {
+                    if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+                });
+            }, { threshold: 0.08 });
+            document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+# Modelos entrenados pesados (van en GitHub Releases o Drive, no en git)
+*.keras
+*.onnx
+*.onnx.data
+checkpoint_*.pth
+mejor_resnet18.pth
+modelo_fp32.pth
+modelo_int8_dinamico.pth
+Centinela_Fase3_ResNet18.pth
+
+# Excepcion: el modelo cuantizado liviano si se versiona
+!fase3/modelos/modelo_int8_estatico.pth
+
+# Comprimidos y temporales
+*.zip
+*.rar
+*.7z
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Sistema
+Thumbs.db
+.DS_Store
