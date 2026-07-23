@@ -61,7 +61,7 @@ contiene las tres fases completas.
 > **Nota sobre los modelos pesados:** GitHub limita cada archivo a 100 MB. Los
 > pesos completos de la Fase 3 (`.keras` de 270 MB, checkpoints de 128 MB, etc.)
 > están publicados en Google Drive / GitHub Releases. El detalle y los enlaces
-> están en [`fase3/modelos/README_modelos.md`](fase3/modelos/README_modelos.md).
+> están en [`fase3/modelos/README_modelos.md`](https://drive.google.com/drive/folders/1qpi2XzIK-A4srky-j-Ho0m-AuMbnToil?usp=sharing).
 > El único peso versionado aquí es el modelo cuantizado INT8 estático (~11 MB),
 > que es precisamente el artefacto que se despliega en campo.
 
